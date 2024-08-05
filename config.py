@@ -6,15 +6,34 @@ import datetime
 import calendar
 from calendar import monthrange
 from openpyxl.styles import PatternFill,Font, Color, Border, Side, Alignment
+import random
+import sys
 
 ############################ VARIABLES #####################
 excel_file_name = "kalender.xlsx"
 
 users = ['Marcel','Antje','Johannes','Irma','Arthur']
+colors = ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
+user_colors = dict()
+
 
 cal = calendar.Calendar()
 #actual_year = datetime.date.today().year
-actual_year = 2023
+actual_year = 2024
+
+############################ FUNCTIONS #####################
+def print_list(list):
+    print("[", end='')
+    for element in list:
+        print("{},".format(element), end='')
+    print("]")
+
+def associate_colors_to_users():
+    global user_colors
+    for user in users:
+        key = random.sample(colors, 1)
+        user_colors.update({ user : key[0] })
+        colors.remove(key[0])
 
 def add_header(worksheet):
     worksheet.merge_cells('A1:AG1')
@@ -29,20 +48,29 @@ def set_header_colomn_style (cell):
     cell.font = Font(name='Arial', bold=True)
     cell.alignment = Alignment(horizontal='center')
     cell.border = Border(bottom=Side(border_style="thin", color="000000"))
-    cell.fill = PatternFill(start_color="CFCFCF", end_color="0F0F0F", fill_type="solid")
+    cell.fill = PatternFill(start_color='CFCFCF', end_color='CFCFCF', fill_type="solid")
 
-def set_column_width(workspace):
+def set_user_cell_style(cell, usercolor):
+    cell.font = Font(name='Arial', bold=False)
+    cell.alignment = Alignment(horizontal='left')
+    #cell.border = Border(bottom=Side(border_style="thin", color="000000"))
+    cell.fill = PatternFill(start_color=usercolor, end_color=usercolor, fill_type="solid")
+
+
+def set_column_width(worksheet):
     # set cell width of month name
     column_range = ['A','AG']
     for column in column_range:
-        workspace.column_dimensions[column].width = 25
+        worksheet.column_dimensions[column].width = 25
 
     # set cell width of days of month
     column_range = ['B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF']
     for column in column_range:
-        workspace.column_dimensions[column].width = 5
+        worksheet.column_dimensions[column].width = 5
 
 ############################ MAIN #####################
+associate_colors_to_users()
+
 wb = Workbook()
 
 # grab the active worksheet
@@ -54,84 +82,38 @@ set_column_width(ws)
 
 row_count = 3
 
-### iterating over the last month of the year before
-_, last_day_of_month = monthrange(actual_year - 1, 12)
-actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[12])
-set_header_colomn_style(actual_cell)
-
-column_position = 0
-for column in range(1,32):
-    if column_position < last_day_of_month:
-        actual_cell = ws.cell(row=row_count, column=column+1, value=column)
+def append_month(year, range_list):
+    global row_count
+    for month in range_list:
+        _, last_day_of_month = monthrange(year, month)
+        actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
         set_header_colomn_style(actual_cell)
-    else:
-        actual_cell = ws.cell(row=row_count, column=column+1, value='')
+
+        column_position = 0
+        for column in range(1,32):
+            if column_position < last_day_of_month:
+                actual_cell = ws.cell(row=row_count, column=column+1, value=column)
+                set_header_colomn_style(actual_cell)
+            else:
+                actual_cell = ws.cell(row=row_count, column=column+1, value='')
+                set_header_colomn_style(actual_cell)
+            column_position += 1
+        actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[12])
         set_header_colomn_style(actual_cell)
-    column_position += 1
-actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[12])
-set_header_colomn_style(actual_cell)
-row_count = row_count + 1
-for user in users:
-    ws.cell(row=row_count,column=1,value=user)
-    ws.cell(row=row_count,column=33,value=user)
-    row_count = row_count + 1
-# let two rows empty for spacing
-row_count = row_count + 2
-
-
-### iterating over the month of the specified year
-for month in range(1,13):
-    # get count of days for the actual month in for loop
-    _, last_day_of_month = monthrange(actual_year, month)
-
-    actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
-    set_header_colomn_style(actual_cell)
-
-    #for column in range(1,last_day_of_month + 1):
-    column_position = 0
-    for column in range(1,32):
-        if column_position < last_day_of_month:
-            actual_cell = ws.cell(row=row_count, column=column+1, value=column)
-            set_header_colomn_style(actual_cell)
-        else:
-            actual_cell = ws.cell(row=row_count, column=column+1, value='')
-            set_header_colomn_style(actual_cell)
-        column_position += 1
-
-    actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[month])
-    set_header_colomn_style(actual_cell)
-    row_count = row_count + 1
-
-    for user in users:
-        ws.cell(row=row_count,column=1,value=user)
-        ws.cell(row=row_count,column=33,value=user)
         row_count = row_count + 1
+        for user in users:
+            actual_cell = ws.cell(row=row_count,column=1,value=user)
+            set_user_cell_style(actual_cell, user_colors[user])
+            actual_cell = ws.cell(row=row_count,column=33,value=user)
+            set_user_cell_style(actual_cell, user_colors[user])
+            row_count = row_count + 1
+        # let two rows empty for spacing
+        row_count = row_count + 2
 
-    # let two rows empty for spacing
-    row_count = row_count + 2
-
-### iterating over the first month of the year after
-_, last_day_of_month = monthrange(actual_year + 1, 1)
-actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[1])
-set_header_colomn_style(actual_cell)
-
-column_position = 0
-for column in range(1,32):
-    if column_position < last_day_of_month:
-        actual_cell = ws.cell(row=row_count, column=column+1, value=column)
-        set_header_colomn_style(actual_cell)
-    else:
-        actual_cell = ws.cell(row=row_count, column=column+1, value='')
-        set_header_colomn_style(actual_cell)
-    column_position += 1
-actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[1])
-set_header_colomn_style(actual_cell)
-row_count = row_count + 1
-for user in users:
-    ws.cell(row=row_count,column=1,value=user)
-    ws.cell(row=row_count,column=33,value=user)
-    row_count = row_count + 1
-
+# generating month
+append_month(actual_year - 1,list([12]))
+append_month(actual_year,range(1,13))
+append_month(actual_year + 1,list([1]))
 
 # Save the file
 wb.save(excel_file_name)
