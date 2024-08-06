@@ -5,14 +5,24 @@
 # - pyyaml
 
 ############################ IMPORTS #####################
+import sys
+
+# import for creating excel files
 from openpyxl import Workbook
 import datetime
 import calendar
 from calendar import monthrange
 from openpyxl.styles import PatternFill,Font, Color, Border, Side, Alignment
+
+# import for pickung randomized elements from list colors[]
 import random
-import sys
+
+
+# import for reading yaml configuration files
 import yaml
+
+# import for printing date in localized format
+import locale
 
 ############################ VARIABLES #####################
 excel_file_name = None
@@ -36,6 +46,12 @@ def load_config():
     global cal_config
     with open(config_name, 'r') as file:
         cal_config = yaml.safe_load(file)
+
+def check_config_locale():
+    global cal_config
+    if not "locale" in cal_config:
+        cal_config.update({ "locale" : "de_DE" })
+        print("No locale found in confiuguration file {}, using default locale {}".format(config_name,cal_config['locale']))
 
 def check_config_colors():
     global cal_config
@@ -68,6 +84,7 @@ def check_config_year():
         print("No option \"year_for_calendar\" found in configuration file {}, using default: {}".format("config.yml", actual_year))
 
 def check_config():
+    check_config_locale()
     check_config_colors()
     check_config_excel_file_name()
     check_config_year()
@@ -151,6 +168,8 @@ def append_month(year, month_range_list):
 load_config()
 
 check_config()
+
+locale.setlocale(locale.LC_ALL, cal_config['locale'])
 
 # associate colors to users
 associate_colors_to_users_if_not_set()
