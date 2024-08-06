@@ -1,5 +1,4 @@
 
-
 # packages to install on ubuntu:
 # - python3-openpyxl
 # - python3-bs4
@@ -16,34 +15,62 @@ import sys
 import yaml
 
 ############################ VARIABLES #####################
-excel_file_name = "kalender.xlsx"
+excel_file_name = None
 
 # row to start from, row_count must be greater equal 1
 row_count = 1
 
-# dict with users to setup
-users = ['Marcel','Antje','Johannes','Irma','Arthur']
-user_colors = dict()
+colors = list()
 
-colors = ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
-
-configuration_file = None
+cal_config = None
+config_name = 'config.yml'
 
 cal = calendar.Calendar()
-actual_year = datetime.date.today().year
 
+actual_year = None
 
+wb = Workbook()
 
 ############################ FUNCTIONS #####################
-def load_configuration():
-    global configuration_file
-    with open('config.yml', 'r') as file:
-        configuration_file = yaml.safe_load(file)
+def load_config():
+    global cal_config
+    with open(config_name, 'r') as file:
+        cal_config = yaml.safe_load(file)
 
-def check_actual_year():
+def check_config_colors():
+    global cal_config
+    global colors
+    # check if colors are specified in configurations file, otherwise use default
+    if "available_colors" in cal_config:
+        colors = cal_config['available_colors'].copy()
+    else:
+        colors = ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
+        print("Using default colors: {}".format(colors))
+
+def check_config_excel_file_name():
+    global cal_config
+    global excel_file_name
+    # check if output file name is given via configuration file, otherwise use >kalender.xlsx<
+    if "excel_file_name" in cal_config:
+        excel_file_name = cal_config['excel_file_name']
+    else:
+        excel_file_name = "kalender.xlsx"
+        print("Using default file name for Excel output: {}".format(excel_file_name))
+
+def check_config_year():
+    global cal_config
     global actual_year
-    if c.year_for_calendar != '':
-        actual_year = c.year_for_calendar
+    # check if actual year is given via configuration file, otherwise take datetime.date.today().year as actual_year
+    if "year_for_calendar" in cal_config:
+        actual_year = cal_config['year_for_calendar']
+    else:
+        actual_year = datetime.date.today().year
+        print("No option \"year_for_calendar\" found in configuration file {}, using default: {}".format("config.yml", actual_year))
+
+def check_config():
+    check_config_colors()
+    check_config_excel_file_name()
+    check_config_year()
 
 def print_list(list):
     print("[", end='')
@@ -51,12 +78,12 @@ def print_list(list):
         print("{},".format(element), end='')
     print("]")
 
-def associate_colors_to_users():
-    global user_colors
-    for user in users:
-        key = random.sample(colors, 1)
-        user_colors.update({ user : key[0] })
-        colors.remove(key[0])
+def associate_colors_to_users_if_not_set():
+    for user in cal_config['users']:
+        if not "color" in user:
+            key = random.sample(colors, 1)
+            user.update( { "color" : key[0] } )
+            colors.remove(key[0])
 
 def add_header(worksheet):
     global row_count
@@ -92,9 +119,9 @@ def set_column_width(worksheet):
     for column in column_range:
         worksheet.column_dimensions[column].width = 5
 
-def append_month(year, range_list):
+def append_month(year, month_range_list):
     global row_count
-    for month in range_list:
+    for month in month_range_list:
         _, last_day_of_month = monthrange(year, month)
         actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
         set_header_colomn_style(actual_cell)
@@ -111,21 +138,22 @@ def append_month(year, range_list):
         actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[12])
         set_header_colomn_style(actual_cell)
         row_count = row_count + 1
-        for user in users:
-            actual_cell = ws.cell(row=row_count,column=1,value=user)
-            set_user_cell_style(actual_cell, user_colors[user])
-            actual_cell = ws.cell(row=row_count,column=33,value=user)
-            set_user_cell_style(actual_cell, user_colors[user])
+        for user in cal_config['users']:
+            actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
+            set_user_cell_style(actual_cell, user["color"])
+            actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
+            set_user_cell_style(actual_cell, user["color"])
             row_count = row_count + 1
         # let two rows empty for spacing
         row_count = row_count + 2
 
 ############################ MAIN #####################
-load_configuration()
+load_config()
 
-associate_colors_to_users()
+check_config()
 
-wb = Workbook()
+# associate colors to users
+associate_colors_to_users_if_not_set()
 
 # grab the active worksheet
 ws = wb.active
