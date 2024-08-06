@@ -5,9 +5,13 @@ available_colors: ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000F
 # output file name
 excel_file_name: "kalender.xlsx"
 
+# local for printing localized dates
+locale: "de_DE"
+
 # manual override of year, default is datetime.date.today().year
 # year_for_calendar: 2024
 
+# list of users that should appear in the excel file
 users:
   - name: "Marcel"
     vacation_dates:
