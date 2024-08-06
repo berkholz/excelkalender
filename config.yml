@@ -1,0 +1,25 @@
+
+
+# colors that users can get. If more users than colors are used, colors have to be extended
+available_colors: ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
+excel_file_name: "kalender.xlsx"
+year_for_calendar: 2024
+
+users:
+  user1:
+    name: "Marcel"
+    vacation_dates:
+      - { "begin" : "01.01.2024" }
+    color: "00ff0000"
+  Antje:
+    name: "Antje"
+    vacation_dates:
+      - { "begin" : "01.01.2024" }
+    color: "00ff0000"
+  Schulferien_Berlin:
+    name: "Schulferien Berlin"
+    vacation_dates:
+      - { "begin" : "10.02.2024" }
+    color: "000000"
+
+
