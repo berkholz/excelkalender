@@ -17,6 +17,8 @@ from openpyxl.styles import PatternFill,Font, Color, Border, Side, Alignment
 # import for pickung randomized elements from list colors[]
 import random
 
+# import for triggering REST API for holidays retrieval
+import requests
 
 # import for reading yaml configuration files
 import yaml
@@ -38,6 +40,8 @@ config_name = 'config.yml'
 cal = calendar.Calendar()
 
 actual_year = None
+
+holidays = list()
 
 wb = Workbook()
 
@@ -139,10 +143,13 @@ def set_column_width(worksheet):
 def append_month(year, month_range_list):
     global row_count
     for month in month_range_list:
+
+        # add month name to begin of row
         _, last_day_of_month = monthrange(year, month)
         actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
         set_header_colomn_style(actual_cell)
 
+        # add days to same row of month name
         column_position = 0
         for column in range(1,32):
             if column_position < last_day_of_month:
@@ -152,24 +159,92 @@ def append_month(year, month_range_list):
                 actual_cell = ws.cell(row=row_count, column=column+1, value='')
                 set_header_colomn_style(actual_cell)
             column_position += 1
-        actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[12])
+        # add month name to end of row
+        actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[month])
         set_header_colomn_style(actual_cell)
         row_count = row_count + 1
+
+        # add users as separate rows
         for user in cal_config['users']:
-            actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
-            set_user_cell_style(actual_cell, user["color"])
-            actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
-            set_user_cell_style(actual_cell, user["color"])
+            if user['name'] == cal_config['oh_api_show_name']:
+                actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
+                set_user_cell_style(actual_cell, user["color"])
+                for col in range(1,last_day_of_month + 1):
+                    actual_cell = ws.cell(row=row_count,column=col+1,value='')
+                    if is_date_in_holidays(datetime.datetime(year,month,col)):
+                        set_user_cell_style(actual_cell, user["color"])
+                actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
+                set_user_cell_style(actual_cell, user["color"])
+            else:
+                actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
+                set_user_cell_style(actual_cell, user["color"])
+                actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
+                set_user_cell_style(actual_cell, user["color"])
             row_count = row_count + 1
         # let two rows empty for spacing
         row_count = row_count + 2
 
+
+def get_public_holidays():
+    global holidays
+    global cal_config
+    url = cal_config['oh_api_base_url'] + "PublicHolidays?countryIsoCode=" + cal_config['oh_api_country_iso_code'] + "&languageIsoCode=" + cal_config['oh_api_language_iso_code'] + "&validFrom=" + str(actual_year - 1) + "-12-01" + "&validTo=" + str(actual_year + 1) + "-01-31" + "&subdivisionCode=" + cal_config['oh_api_subdivision_code']
+
+    response = requests.get(url)
+    response_json = response.json()
+
+    for holiday in response_json:
+        startDate = holiday['startDate'].split("-")
+        endDate = holiday['endDate'].split('-')
+        conv_startDate = datetime.datetime(int(startDate[0]),int(startDate[1]),int(startDate[2]))
+        conv_endDate = datetime.datetime(int(endDate[0]),int(endDate[1]),int(endDate[2]))
+        holidays.append((conv_startDate,conv_endDate))
+
+def get_school_holidays():
+    global holidays
+    url = cal_config['oh_api_base_url'] + "SchoolHolidays?countryIsoCode=" + cal_config['oh_api_country_iso_code'] + "&languageIsoCode=" + cal_config['oh_api_language_iso_code'] + "&validFrom=" + str(actual_year - 1) + "-12-01" + "&validTo=" + str(actual_year + 1) + "-01-31" + "&subdivisionCode=" + cal_config['oh_api_subdivision_code']
+
+    response = requests.get(url)
+    response_json = response.json()
+
+    for holiday in response_json:
+        startDate = holiday['startDate'].split("-")
+        endDate = holiday['endDate'].split('-')
+        conv_startDate = datetime.datetime(int(startDate[0]),int(startDate[1]),int(startDate[2]))
+        conv_endDate = datetime.datetime(int(endDate[0]),int(endDate[1]),int(endDate[2]))
+        holidays.append((conv_startDate,conv_endDate))
+
+def add_holidays_as_user():
+    new_user = dict({ "name" : cal_config['oh_api_show_name'], "color" : cal_config['oh_api_show_color']})
+    cal_config['users'].append(new_user)
+
+def print_holidays():
+    for tupel in holidays:
+        print(tupel)
+
+def is_date_in_holidays(date):
+    global holidays
+    return is_date_in_list_tupels(date, holidays)
+
+def is_date_in_list_tupels(date, list_of_date_tupels):
+    for start, end in list_of_date_tupels:
+        if date >= start and date <= end:
+            return True
+    return False
+
 ############################ MAIN #####################
+
 load_config()
 
 check_config()
 
 locale.setlocale(locale.LC_ALL, cal_config['locale'])
+
+get_school_holidays()
+
+# print_list(holidays)
+
+add_holidays_as_user()
 
 # associate colors to users
 associate_colors_to_users_if_not_set()
