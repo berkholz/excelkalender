@@ -21,8 +21,13 @@ users:
       - { "begin" : "01.01.2024", "end" : "02.01.2024" }
 
 ### OPENHOLIDAYSAPI
+### Links:
+###  - https://openholidaysapi.org/swagger/index.html
+###  - https://www.openholidaysapi.org/de/api/
+
 oh_api_base_url: "https://openholidaysapi.org/"
 
+# see https://www.iso.org/iso-3166-country-codes.html for more country codes
 oh_api_country_iso_code: "DE"
 
 oh_api_language_iso_code: "DE"
