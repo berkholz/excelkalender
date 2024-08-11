@@ -140,7 +140,10 @@ def set_user_cell_style(cell, usercolor):
     cell.font = Font(name='Arial', bold=False)
     cell.alignment = Alignment(horizontal='left')
     #cell.border = Border(bottom=Side(border_style="thin", color="000000"))
-    cell.fill = PatternFill(start_color=usercolor, end_color=usercolor, fill_type="solid")
+    if usercolor == "":
+        cell.fill = PatternFill()
+    else:
+        cell.fill = PatternFill(start_color=usercolor, end_color=usercolor, fill_type="solid")
 
 def set_column_width(worksheet):
     # set cell width of month name
