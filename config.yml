@@ -1,11 +1,22 @@
 
-# colors that users can get. If more users than colors are used, colors have to be extended
-available_colors: ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
+###### COLOR STAFF ######
+
+# Colors for users. If more users than colors are used, colors have to be extended.
+available_user_colors: ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
+
+# color for higlighting the saturday, default is 'CFCFCF'
+color_saturday: 'CFCFCF'
+
+# color for higlighting the sunday, default is 'CFCFCF'
+color_sunday: 'BFBFBF'
+
+# set generic background color of cell with day number, default is 'CFCFCF'
+header_bgcolor: 'EFEFEF'
 
 # output file name
 excel_file_name: "kalender.xlsx"
 
-# local for printing localized dates
+# locale for printing localized dates
 locale: "de_DE"
 
 # manual override of year, default is datetime.date.today().year
@@ -15,10 +26,14 @@ locale: "de_DE"
 users:
   - name: "Marcel"
     vacation_dates:
-      - { "begin" : "01.01.2024", "end" : "02.01.2024" }
+      - { "startDate" : "2024-01-01", "endDate" : "2024-02-01" }
   - name: "Antje"
     vacation_dates:
-      - { "begin" : "01.01.2024", "end" : "02.01.2024" }
+      - { "startDate" : "2024-10-01", "endDate" : "2024-11-03" }
+  # - name: "Example User"
+  #   vacation_dates:
+  #     - { "startDate" : "YYYY-MM-DD", "endDate" : "YYYY-MM-DD" }
+  #   color: "00FF00"
 
 ### OPENHOLIDAYSAPI
 ### Links:
@@ -41,5 +56,5 @@ oh_api_show_holidays: True
 oh_api_show_name: "Schulferien Berlin"
 
 # show holidays with this color
-oh_api_show_color: "EFaaEF"
+oh_api_show_color: "53FF44"
 
