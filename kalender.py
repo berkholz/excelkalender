@@ -236,7 +236,15 @@ def append_month(year, month_range_list):
                 set_user_cell_style(actual_cell, user['color'])
             else: # normal user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
-                set_user_cell_style(actual_cell, user["color"])
+                set_user_cell_style(actual_cell, user['color'])
+
+                for col in range(1,last_day_of_month + 1):
+                    actual_cell = ws.cell(row=row_count,column=col+1,value='')
+
+                    if is_date_in_list_tupels(datetime.datetime(year,month,col), convert_str_date_list_to_datetime_list(user['vacation_dates'])):
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']))
+                    else:
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,""))
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
                 set_user_cell_style(actual_cell, user["color"])
             row_count = row_count + 1
