@@ -64,8 +64,8 @@ def check_config_available_user_colors():
     global cal_config
     global colors
     # check if colors are specified in configurations file, otherwise use default
-    if "available_colors" in cal_config:
-        colors = cal_config['available_colors'].copy()
+    if "available_user_colors" in cal_config:
+        colors = cal_config['available_user_colors'].copy()
     else:
         colors = ['00FF0000','0000FF00','000000FF','00FFFF00','00FF00FF','0000FFFF','00008000','00008080','00800080','009999FF','00FFFFCC','00FF8080','00CCCCFF','0099CC00','00FFCC00','00FF9900','00FF6600','00993300']
         print("Using default colors: {}".format(colors))
@@ -92,7 +92,7 @@ def check_config_year():
 
 def check_config():
     check_config_locale()
-    check_config_colors()
+    check_config_available_user_colors()
     check_config_excel_file_name()
     check_config_year()
 
