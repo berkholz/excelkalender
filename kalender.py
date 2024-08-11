@@ -159,15 +159,17 @@ def set_column_width(worksheet):
 def append_month(year, month_range_list):
     global row_count
     for month in month_range_list:
-
+        ### MONTH TITLE ROW
         # add month name to begin of row
         _, last_day_of_month = monthrange(year, month)
         actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
         set_header_colomn_style(actual_cell)
 
-        # add days to same row of month name
+        # Add days to same row of month name. That is the month line with its days.
         column_position = 0
+        # We show 31 days, ...
         for column in range(1,32):
+            # ..., but only days existing in month are filled with values.
             if column_position < last_day_of_month:
                 actual_cell = ws.cell(row=row_count, column=column+1, value=column)
                 set_header_colomn_style(actual_cell)
@@ -180,9 +182,11 @@ def append_month(year, month_range_list):
         set_header_colomn_style(actual_cell)
         row_count = row_count + 1
 
+        ### USER ROWS
         # add users as separate rows
         for user in cal_config['users']:
-            if user['name'] == cal_config['oh_api_show_name']:
+            # check if we have our holidays user
+            if user['name'] == cal_config['oh_api_show_name']: # holiday user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
                 set_user_cell_style(actual_cell, user["color"])
                 for col in range(1,last_day_of_month + 1):
@@ -190,8 +194,8 @@ def append_month(year, month_range_list):
                     if is_date_in_holidays(datetime.datetime(year,month,col)):
                         set_user_cell_style(actual_cell, user["color"])
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
-                set_user_cell_style(actual_cell, user["color"])
-            else:
+                set_user_cell_style(actual_cell, user['color'])
+            else: # normal user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
                 set_user_cell_style(actual_cell, user["color"])
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
@@ -269,14 +273,17 @@ associate_colors_to_users_if_not_set()
 ws = wb.active
 ws.title = str(actual_year)
 
+# add header (year) as title to the excel
 add_header(ws)
+
+# set colomn width of days
 set_column_width(ws)
 
-
-
-# generating month
+# generating last month of year before
 append_month(actual_year - 1,list([12]))
+# generating specified year
 append_month(actual_year,range(1,13))
+# generating first month of year after
 append_month(actual_year + 1,list([1]))
 
 # Save the file
