@@ -127,11 +127,14 @@ def add_header(worksheet):
     #cell.fill = PatternFill(start_color="CFCFCF", end_color="0F0F0F", fill_type="solid")
     row_count = 3
 
-def set_header_colomn_style (cell):
+def set_header_colomn_style (cell, bgcolor):
     cell.font = Font(name='Arial', bold=True)
     cell.alignment = Alignment(horizontal='center')
     cell.border = Border(bottom=Side(border_style="thin", color="000000"))
-    cell.fill = PatternFill(start_color='CFCFCF', end_color='CFCFCF', fill_type="solid")
+    if bgcolor == "":
+        cell.fill = PatternFill()
+    else:
+        cell.fill = PatternFill(start_color=bgcolor, end_color=bgcolor, fill_type="solid")
 
 def set_user_cell_style(cell, usercolor):
     cell.font = Font(name='Arial', bold=False)
