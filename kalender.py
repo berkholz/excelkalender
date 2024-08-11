@@ -90,11 +90,18 @@ def check_config_year():
         actual_year = datetime.date.today().year
         print("No option \"year_for_calendar\" found in configuration file {}, using default: {}".format("config.yml", actual_year))
 
+def check_config_header_bgcolor():
+    global cal_config
+    if "header_bgcolor" not in cal_config:
+        cal_config.update( { "header_bgcolor" : "CFCFCF" } )
+        print("No option \"header_bgcolor\" found in configuration file {}, using default: {}".format("config.yml", "CFCFCF"))
+
 def check_config():
     check_config_locale()
     check_config_available_user_colors()
     check_config_excel_file_name()
     check_config_year()
+    check_config_header_bgcolor()
 
 def print_list(list):
     print("[", end='')
