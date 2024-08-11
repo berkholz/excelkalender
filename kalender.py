@@ -57,7 +57,10 @@ def check_config_locale():
         cal_config.update({ "locale" : "de_DE" })
         print("No locale found in confiuguration file {}, using default locale {}".format(config_name,cal_config['locale']))
 
-def check_config_colors():
+
+
+
+def check_config_available_user_colors():
     global cal_config
     global colors
     # check if colors are specified in configurations file, otherwise use default
