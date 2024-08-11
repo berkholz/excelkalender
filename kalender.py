@@ -156,6 +156,43 @@ def set_column_width(worksheet):
     for column in column_range:
         worksheet.column_dimensions[column].width = 5
 
+def check_weekend(year, month, day):
+    day_to_check = datetime.date(year,month,day).isoweekday()
+
+    # check if we have sunday (7) or saturday (6) and return accordingly color
+    if day_to_check == 6:
+        return True, 6
+    elif day_to_check == 7:
+        return True, 7
+    else:
+        return False, day_to_check
+
+def get_header_color_for_weekday(year,month,day):
+    global cal_config
+    bgcolor = cal_config['header_bgcolor']
+
+    weekend, weekday = check_weekend(year,month,day)
+    if weekend and weekday == 6:
+        if "color_saturday" in cal_config:
+           bgcolor = cal_config['color_saturday']
+    elif weekend and weekday == 7:
+        if "color_sunday" in cal_config:
+           bgcolor = cal_config['color_sunday']
+    return bgcolor
+
+def get_user_color_for_weekday(year,month,day, default_user_color):
+    global cal_config
+    bgcolor = default_user_color
+
+    weekend, weekday = check_weekend(year,month,day)
+    if weekend and weekday == 6:
+        if "color_saturday" in cal_config:
+           bgcolor = cal_config['color_saturday']
+    elif weekend and weekday == 7:
+        if "color_sunday" in cal_config:
+           bgcolor = cal_config['color_sunday']
+    return bgcolor
+
 def append_month(year, month_range_list):
     global row_count
     for month in month_range_list:
@@ -172,7 +209,7 @@ def append_month(year, month_range_list):
             # ..., but only days existing in month are filled with values.
             if column_position < last_day_of_month:
                 actual_cell = ws.cell(row=row_count, column=column+1, value=column)
-                set_header_colomn_style(actual_cell)
+                set_header_colomn_style(actual_cell, get_header_color_for_weekday(year, month, column_position+1))
             else:
                 actual_cell = ws.cell(row=row_count, column=column+1, value='')
                 set_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
@@ -188,11 +225,13 @@ def append_month(year, month_range_list):
             # check if we have our holidays user
             if user['name'] == cal_config['oh_api_show_name']: # holiday user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
-                set_user_cell_style(actual_cell, user["color"])
+                set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']))
                 for col in range(1,last_day_of_month + 1):
                     actual_cell = ws.cell(row=row_count,column=col+1,value='')
                     if is_date_in_holidays(datetime.datetime(year,month,col)):
-                        set_user_cell_style(actual_cell, user["color"])
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']))
+                    else:
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,""))
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
                 set_user_cell_style(actual_cell, user['color'])
             else: # normal user
