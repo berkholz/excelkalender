@@ -204,35 +204,41 @@ def append_month(year, month_range_list):
         # let two rows empty for spacing
         row_count = row_count + 2
 
+def convert_str_date_list_to_datetime_list(str_date_list):
+    datetime_list = list()
 
-def get_public_holidays():
+    for str_date_tupel in str_date_list:
+        datetime_list.append(convert_str_date_to_datetime(str_date_tupel['startDate'],str_date_tupel['endDate']))
+
+    return datetime_list
+
+def convert_str_date_to_datetime(startDate, endDate):
+    tmp_start = startDate.split("-")
+    tmp_end = endDate.split('-')
+    conv_startDate = datetime.datetime(int(tmp_start[0]),int(tmp_start[1]),int(tmp_start[2]))
+    conv_endDate = datetime.datetime(int(tmp_end[0]),int(tmp_end[1]),int(tmp_end[2]))
+    return conv_startDate,conv_endDate
+
+def get_holidays(type_of_holidays):
     global holidays
     global cal_config
-    url = cal_config['oh_api_base_url'] + "PublicHolidays?countryIsoCode=" + cal_config['oh_api_country_iso_code'] + "&languageIsoCode=" + cal_config['oh_api_language_iso_code'] + "&validFrom=" + str(actual_year - 1) + "-12-01" + "&validTo=" + str(actual_year + 1) + "-01-31" + "&subdivisionCode=" + cal_config['oh_api_subdivision_code']
+    if type_of_holidays == "public":
+        query_string = "PublicHolidays"
+    else:
+        query_string = "SchoolHolidays"
+    url = cal_config['oh_api_base_url'] + query_string + "?countryIsoCode=" + cal_config['oh_api_country_iso_code'] + "&languageIsoCode=" + cal_config['oh_api_language_iso_code'] + "&validFrom=" + str(actual_year - 1) + "-12-01" + "&validTo=" + str(actual_year + 1) + "-01-31" + "&subdivisionCode=" + cal_config['oh_api_subdivision_code']
 
     response = requests.get(url)
     response_json = response.json()
 
     for holiday in response_json:
-        startDate = holiday['startDate'].split("-")
-        endDate = holiday['endDate'].split('-')
-        conv_startDate = datetime.datetime(int(startDate[0]),int(startDate[1]),int(startDate[2]))
-        conv_endDate = datetime.datetime(int(endDate[0]),int(endDate[1]),int(endDate[2]))
-        holidays.append((conv_startDate,conv_endDate))
+        holidays.append(convert_str_date_to_datetime(holiday['startDate'],holiday['endDate']))
+
+def get_public_holidays():
+    get_holidays("public")
 
 def get_school_holidays():
-    global holidays
-    url = cal_config['oh_api_base_url'] + "SchoolHolidays?countryIsoCode=" + cal_config['oh_api_country_iso_code'] + "&languageIsoCode=" + cal_config['oh_api_language_iso_code'] + "&validFrom=" + str(actual_year - 1) + "-12-01" + "&validTo=" + str(actual_year + 1) + "-01-31" + "&subdivisionCode=" + cal_config['oh_api_subdivision_code']
-
-    response = requests.get(url)
-    response_json = response.json()
-
-    for holiday in response_json:
-        startDate = holiday['startDate'].split("-")
-        endDate = holiday['endDate'].split('-')
-        conv_startDate = datetime.datetime(int(startDate[0]),int(startDate[1]),int(startDate[2]))
-        conv_endDate = datetime.datetime(int(endDate[0]),int(endDate[1]),int(endDate[2]))
-        holidays.append((conv_startDate,conv_endDate))
+    get_holidays("school")
 
 def add_holidays_as_user():
     new_user = dict({ "name" : cal_config['oh_api_show_name'], "color" : cal_config['oh_api_show_color']})
