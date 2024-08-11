@@ -276,7 +276,8 @@ associate_colors_to_users_if_not_set()
 
 # grab the active worksheet
 ws = wb.active
-ws.title = str(actual_year)
+# set title of the worksheet
+ws.title = "Urlaubsplanung " + str(actual_year)
 
 # add header (year) as title to the excel
 add_header(ws)
