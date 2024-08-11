@@ -266,11 +266,10 @@ check_config()
 
 locale.setlocale(locale.LC_ALL, cal_config['locale'])
 
-get_school_holidays()
-
-# print_list(holidays)
-
-add_holidays_as_user()
+# show holidays only if specified, default is True
+if cal_config['oh_api_show_holidays']:
+    get_school_holidays()
+    add_holidays_as_user()
 
 # associate colors to users
 associate_colors_to_users_if_not_set()
