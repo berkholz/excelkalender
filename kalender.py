@@ -163,7 +163,7 @@ def append_month(year, month_range_list):
         # add month name to begin of row
         _, last_day_of_month = monthrange(year, month)
         actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
-        set_header_colomn_style(actual_cell)
+        set_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
 
         # Add days to same row of month name. That is the month line with its days.
         column_position = 0
@@ -175,11 +175,11 @@ def append_month(year, month_range_list):
                 set_header_colomn_style(actual_cell)
             else:
                 actual_cell = ws.cell(row=row_count, column=column+1, value='')
-                set_header_colomn_style(actual_cell)
+                set_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
             column_position += 1
         # add month name to end of row
         actual_cell = ws.cell(row=row_count,column=33,value=calendar.month_name[month])
-        set_header_colomn_style(actual_cell)
+        set_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
         row_count = row_count + 1
 
         ### USER ROWS
