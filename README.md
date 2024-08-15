@@ -14,11 +14,12 @@ python3 kalender.py
 ```
 
 As output you get an excel file with this result:
-!(assets/images/excelkalender-output.png)
+
+![excelkalender-output](./assets/images/excelkalender-output.png)
 
 
 ## Configuration
-For more informations about configuring the script, see configuration file itself [config.yml].
+For more informations about configuring the script, see configuration file itself [config.yml](./config.yml).
 
 
 ## Build
