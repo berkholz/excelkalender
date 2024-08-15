@@ -1,7 +1,7 @@
 # excelkalender
 Python tool for creating an excel file as calendar overview. It contains all month of the specified year and each month before and after the year.
 
-The script can be configured by the configuration file config.yml. If you want a different file name, specify it in this file (variable config_name).
+The script can be configured by the configuration file [config.yml](config.yml). If you want a different file name, specify it in file [kalender.py](./kalender.py) (variable config_name).
 
 Holidays can be fetched from openapi.org via web request, see options oh_api_* in configuration file.
 
