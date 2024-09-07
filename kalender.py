@@ -184,6 +184,7 @@ def check_weekend(year, month, day):
         return False, day_to_check
 
 def get_user_color_for_weekday(year,month,day, default_user_color):
+    """This function returns the appropiate back ground color for user cells."""
     global cal_config
     bgcolor = default_user_color
 
