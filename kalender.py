@@ -150,7 +150,7 @@ def set_month_header_colomn_style (cell, bgcolor):
     else:
         cell.fill = PatternFill(start_color=bgcolor, end_color=bgcolor, fill_type="solid")
 
-def set_user_cell_style(cell, usercolor):
+def set_user_cell_style(cell, usercolor, cborder):
     """Function to set the style of the user rows, e.g. font face, font color, font name and cell fill color."""
     cell.font = Font(name='Arial', bold=False)
     cell.alignment = Alignment(horizontal='left')
@@ -159,6 +159,10 @@ def set_user_cell_style(cell, usercolor):
         cell.fill = PatternFill()
     else:
         cell.fill = PatternFill(start_color=usercolor, end_color=usercolor, fill_type="solid")
+
+    # if borderr is specified for user cell, it will be set with parameter cborder
+    if cborder != '':
+        cell.border = cborder
 
 def set_column_width(worksheet):
     """Function to set the width of the cells for all month and day coloumns."""
@@ -259,33 +263,34 @@ def append_month(year, month_range_list):
         ### USER ROWS
         # add users as separate rows
         for user in cal_config['users']:
+            custom_border = Border(bottom=Side(border_style="thin", color="000000"), left=Side(border_style="thin", color="000000"), right=Side(border_style="thin", color="000000"),top=Side(border_style="thin", color="000000"))
             # check if we have our holidays user
             if user['name'] == cal_config['oh_api_show_name']: # holiday user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
-                set_user_cell_style(actual_cell, user['color'])
+                set_user_cell_style(actual_cell, user['color'], custom_border)
 
                 for col in range(1,last_day_of_month + 1):
                     actual_cell = ws.cell(row=row_count,column=col+1,value='')
                     if is_date_in_holidays(datetime.datetime(year,month,col)):
-                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']))
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']),'')
                     else:
-                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,""))
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,""),'')
 
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
-                set_user_cell_style(actual_cell, user['color'])
+                set_user_cell_style(actual_cell, user['color'], custom_border)
             else: # normal user
                 actual_cell = ws.cell(row=row_count,column=1,value=user['name'])
-                set_user_cell_style(actual_cell, user['color'])
+                set_user_cell_style(actual_cell, user['color'], custom_border)
 
                 for col in range(1,last_day_of_month + 1):
                     actual_cell = ws.cell(row=row_count,column=col+1,value='')
 
                     if is_date_in_list_tupels(datetime.datetime(year,month,col), convert_str_date_list_to_datetime_list(user['vacation_dates'])):
-                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']))
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,user['color']),'')
                     else:
-                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,''))
+                        set_user_cell_style(actual_cell, get_user_color_for_weekday(year,month,col,''),'')
                 actual_cell = ws.cell(row=row_count,column=33,value=user['name'])
-                set_user_cell_style(actual_cell, user['color'])
+                set_user_cell_style(actual_cell, user['color'], custom_border)
             row_count = row_count + 1
         # let two rows empty for spacing
         row_count = row_count + 2
