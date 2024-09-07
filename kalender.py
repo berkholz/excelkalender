@@ -143,7 +143,7 @@ def set_month_header_colomn_style (cell, bgcolor):
     """Function to set the style of the month header row, e.g. font face, font color, font name, border and cell fill color."""
     cell.font = Font(name='Arial', bold=True)
     cell.alignment = Alignment(horizontal='center')
-    cell.border = Border(bottom=Side(border_style="thin", color="000000"))
+    cell.border = Border(bottom=Side(border_style="thin", color="000000"), left=Side(border_style="thin", color="000000"), right=Side(border_style="thin", color="000000"),top=Side(border_style="thin", color="000000"))
     if bgcolor == "":
         # if bgcolor empty the fill color is removed
         cell.fill = PatternFill()
