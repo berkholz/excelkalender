@@ -183,20 +183,6 @@ def check_weekend(year, month, day):
     else:
         return False, day_to_check
 
-## TODO: remove function cause it works like get_user_color_for_weekday
-def get_header_color_for_weekday(year,month,day):
-    global cal_config
-    bgcolor = cal_config['header_bgcolor']
-
-    weekend, weekday = check_weekend(year,month,day)
-    if weekend and weekday == 6:
-        if "color_saturday" in cal_config:
-           bgcolor = cal_config['color_saturday']
-    elif weekend and weekday == 7:
-        if "color_sunday" in cal_config:
-           bgcolor = cal_config['color_sunday']
-    return bgcolor
-
 def get_user_color_for_weekday(year,month,day, default_user_color):
     global cal_config
     bgcolor = default_user_color
