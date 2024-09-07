@@ -145,7 +145,7 @@ def set_month_header_colomn_style (cell, bgcolor):
     cell.alignment = Alignment(horizontal='center')
     cell.border = Border(bottom=Side(border_style="thin", color="000000"), left=Side(border_style="thin", color="000000"), right=Side(border_style="thin", color="000000"),top=Side(border_style="thin", color="000000"))
     if bgcolor == "":
-        # if bgcolor empty the fill color is removed
+        # if bgcolor is empty the fill color is removed
         cell.fill = PatternFill()
     else:
         cell.fill = PatternFill(start_color=bgcolor, end_color=bgcolor, fill_type="solid")
