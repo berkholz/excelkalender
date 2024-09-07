@@ -120,7 +120,7 @@ def print_list(list):
     print("]")
 
 def associate_colors_to_users_if_not_set():
-    """Check if users have color set in configuration file, otherwise use available_colors inc configfile"""
+    """Check if users have color set in configuration file, otherwise use available_colors in configfile"""
     for user in cal_config['users']:
         if not "color" in user:
             key = random.sample(colors, 1)
