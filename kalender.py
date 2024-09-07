@@ -203,7 +203,11 @@ def append_month(year, month_range_list):
     global cal_config
 
     for month in month_range_list:
-        ### MONTH TITLE ROW
+        ### MONTH TITLE ROWS
+        ### 1st: Month name and all days
+        ### 2nd: Year and short name of weekday
+
+        ## 1st MONTH TITLE ROW
         # add month name to begin of row
         _, last_day_of_month = monthrange(year, month)
         actual_cell = ws.cell(row=row_count,column=1,value=calendar.month_name[month])
