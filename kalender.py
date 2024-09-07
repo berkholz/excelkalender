@@ -154,6 +154,7 @@ def set_user_cell_style(cell, usercolor):
     """Function to set the style of the user rows, e.g. font face, font color, font name and cell fill color."""
     cell.font = Font(name='Arial', bold=False)
     cell.alignment = Alignment(horizontal='left')
+    # if color is specified for user cell, it will be set with parameter usercolor
     if usercolor == "":
         cell.fill = PatternFill()
     else:
