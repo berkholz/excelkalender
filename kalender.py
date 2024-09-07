@@ -230,6 +230,31 @@ def append_month(year, month_range_list):
         set_month_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
         row_count = row_count + 1
 
+        ## 2nd MONTH TITLE ROW
+        # add year to begin of row
+        _, last_day_of_month = monthrange(year, month)
+        actual_cell = ws.cell(row=row_count,column=1,value=year)
+        set_month_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
+
+        # Add weekday names to same row of year. That is the 2nd month line with its weekday names.
+        column_position = 0
+        # We show 31 days, ...
+        for column in range(1,32):
+            # ..., but only days existing in month are filled with values.
+            if column_position < last_day_of_month:
+                actual_cell = ws.cell(row=row_count, column=column+1, value=datetime.datetime(year,month, column).strftime('%a'))
+                set_month_header_colomn_style(actual_cell, get_user_color_for_weekday(year, month, column_position+1, cal_config['header_bgcolor']))
+            else:
+                actual_cell = ws.cell(row=row_count, column=column+1, value='')
+                set_month_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
+            column_position += 1
+
+        # add year to end of row
+        actual_cell = ws.cell(row=row_count,column=33,value=year)
+        set_month_header_colomn_style(actual_cell, cal_config['header_bgcolor'])
+        row_count = row_count + 1
+
+
         ### USER ROWS
         # add users as separate rows
         for user in cal_config['users']:
