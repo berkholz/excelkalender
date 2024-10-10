@@ -15,7 +15,7 @@ python3 kalender.py
 
 As output you get an excel file with this result:
 
-![excelkalender-output](./assets/images/excelkalender-output.png)
+![excelkalender-output](https://github.com/berkholz/berkholz.github.io/blob/master/assets/images/excelkalender.png)
 
 
 ## Configuration
